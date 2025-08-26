@@ -1,0 +1,61 @@
+using Moq;
+using UserManagementApi.Controllers;
+using Xunit;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using UserManagementApi;
+
+namespace UserManagementApi.Tests
+{
+    public class UsersControllerTests
+    {
+        private readonly UsersController _controller;
+        private readonly List<User> _users;
+
+        public UsersControllerTests()
+        {
+            _users = new List<User>
+            {
+                new User { Id = 1, Name = "geret dsfs", Username = "Bret", Email = "sfgbs@gmail.com", Phone = "0932048923048", Website = "sfdfsd.com" },
+                new User { Id = 2, Name = "sdfdsf sdfsdfwe", Username = "sdfsdfs", Email = "sfdgrsg@gmail.com", Phone = "0349734023740", Website = "dfsdf.com" }
+            };
+
+            _controller = new UsersController();
+        }
+
+        [Fact]
+        public void GetAllUsers_ReturnsOkResult_WithUsers()
+        {
+            // Act
+            var result = _controller.GetAllUsers();
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var returnValue = Assert.IsType<List<User>>(okResult.Value);
+            Assert.Equal(2, returnValue.Count);  // Assert that 2 users are returned
+        }
+
+        [Fact]
+        public void CreateUser_ReturnsCreatedAtActionResult_WhenValidUser()
+        {
+            // Arrange
+            var newUser = new User
+            {
+                Name = "John Doe",
+                Username = "johndoe",
+                Email = "john.doe@example.com",
+                Phone = "123-456-7890",
+                Website = "www.johndoe.com"
+            };
+
+            // Act
+            var result = _controller.CreateUser(newUser);
+
+            // Assert
+            var createdResult = Assert.IsType<CreatedAtActionResult>(result);
+            var returnValue = Assert.IsType<User>(createdResult.Value);
+            Assert.Equal(newUser.Name, returnValue.Name);
+            Assert.Equal(201, createdResult.StatusCode);  // Assert that status code is 201 Created
+        }
+    }
+}
